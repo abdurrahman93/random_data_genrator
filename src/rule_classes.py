@@ -10,12 +10,21 @@ class IntegerRule(RuleBase):
             self.start = start
             self.end = end 
         else:
-            raise ValueError(f"Star  and End are required")
+            raise ValueError(f"Start and End are required")
 
     @property
     def object_type(self):
         return self._object_type
 
-    
     def get_value(self):
         return random.randint(self.start, self.end)
+
+
+class Nesting:
+
+    def __init__(self, relation_with, no_of_relations):
+        self.relation_with = relation_with
+        self.no_of_relations = no_of_relations
+
+
+

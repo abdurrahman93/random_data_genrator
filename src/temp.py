@@ -1,0 +1,5 @@
+{
+    'name': 'abdur',
+    'detail': 'asdasd'
+
+}
