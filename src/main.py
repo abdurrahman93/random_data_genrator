@@ -1,15 +1,15 @@
-from rule_classes import IntegerRule, Nesting
+from rule_classes import IntegerGenerator, Nesting
 
 
 class Details:
 
-    money = IntegerRule(start=1000, end=20000)
+    money = IntegerGenerator(start=1000, end=20000)
 
 
 class Person:
 
-    age = IntegerRule(start=1, end=10)
-    phone_no = IntegerRule(start=9000000010, end=9999999999)
+    age = IntegerGenerator(start=1, end=10)
+    phone_no = IntegerGenerator(start=9000000010, end=9999999999)
     # details = Nesting(relation_with=Details, no_of_relations=4)
 
 
