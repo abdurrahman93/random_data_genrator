@@ -25,9 +25,10 @@ class IntegerGenerator(DataGeneratorBase):
 
 class Nesting:
 
-    def __init__(self, relation_with, no_of_relations):
+    def __init__(self, relation_with, many=False, many_count=0):
         self.relation_with = relation_with
-        self.no_of_relations = no_of_relations
+        self.many = many
+        self.many_count = many_count
 
 
 
