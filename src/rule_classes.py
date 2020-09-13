@@ -1,6 +1,6 @@
 import random
 from abstract_base import DataGeneratorBase
-import names
+
 
 class IntegerGenerator(DataGeneratorBase):
 
@@ -27,7 +27,7 @@ class StringGenerator(DataGeneratorBase):
 
     def __init__(self, input):
         self._object_type = str
-        self.input=input
+        self.input = input
 
     @property
     def object_type(self):
@@ -37,11 +37,10 @@ class StringGenerator(DataGeneratorBase):
         pass
 
     def get_value(self):
-        if isinstance(self.input,list):
+        if isinstance(self.input, list):
             return random.choice(self.input)
-        if isinstance(self.input,str):
+        if isinstance(self.input, str):
             return names.get_full_name()
-
 
 
 class BooleanGenerator(DataGeneratorBase):
@@ -57,7 +56,8 @@ class BooleanGenerator(DataGeneratorBase):
         pass
 
     def get_value(self):
-            return bool(random.getrandbits(1))
+        return bool(random.getrandbits(1))
+
 
 class Nesting:
 
