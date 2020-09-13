@@ -1,6 +1,8 @@
 import random
 from abstract_base import DataGeneratorBase
-import names
+from pathlib import Path
+import datetime
+
 
 class IntegerGenerator(DataGeneratorBase):
 
@@ -27,7 +29,7 @@ class StringGenerator(DataGeneratorBase):
 
     def __init__(self, input):
         self._object_type = str
-        self.input=input
+        self.input = input
 
     @property
     def object_type(self):
@@ -37,11 +39,12 @@ class StringGenerator(DataGeneratorBase):
         pass
 
     def get_value(self):
-        if isinstance(self.input,list):
+        if isinstance(self.input, list):
             return random.choice(self.input)
-        if isinstance(self.input,str):
-            return names.get_full_name()
-
+        if isinstance(self.input, str):
+            file_path = Path.joinpath(Path().absolute().parent, Path("data_sets"), Path(f"{(self.input).lower()}.txt"))
+            with open(file_path, 'r') as a:
+                return (random.choice(list(a))).strip()
 
 
 class BooleanGenerator(DataGeneratorBase):
@@ -57,7 +60,35 @@ class BooleanGenerator(DataGeneratorBase):
         pass
 
     def get_value(self):
-            return bool(random.getrandbits(1))
+        return bool(random.getrandbits(1))
+
+
+class DateGenerator(DataGeneratorBase):
+
+    def __init__(self, start=None, end=None, format="%Y-%m-%d"):
+        self._object_type = datetime.datetime
+        self.format = format
+        if start and end:
+            self.start = datetime.datetime.strptime(start, self.format)
+            self.end = datetime.datetime.strptime(end, self.format)
+        else:
+            self.start = (datetime.datetime(1950, 1, 1).date())
+            self.end = (datetime.datetime.now().date())
+
+    @property
+    def object_type(self):
+        return self._object_type
+
+    def validate(self):
+        pass
+
+    def get_value(self):
+        time_between_dates = self.end - self.start
+        days_between_dates = time_between_dates.days
+        random_number_of_days = random.randrange(days_between_dates)
+        random_date = self.start + datetime.timedelta(days=random_number_of_days)
+        return random_date.strftime(self.format)
+
 
 class Nesting:
 
