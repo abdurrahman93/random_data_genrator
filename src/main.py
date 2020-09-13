@@ -1,4 +1,4 @@
-from rule_classes import IntegerGenerator,StringGenerator,BooleanGenerator, Nesting
+from rule_classes import IntegerGenerator,StringGenerator,BooleanGenerator,DateGenerator, Nesting
 
 
 class AnotherSubDetails:
@@ -21,7 +21,8 @@ class Person:
 
     age = IntegerGenerator(start=1, end=10)
     phone_no = IntegerGenerator(start=9000000010, end=9999999999)
-    name = StringGenerator("random")
+    name = StringGenerator("country")
+    date_time=DateGenerator()
     eligible=BooleanGenerator()
     details = Nesting(relation_with=Details)
 
