@@ -1,4 +1,4 @@
-from rule_classes import IntegerGenerator, Nesting
+from rule_classes import IntegerGenerator,StringGenerator,BooleanGenerator, Nesting
 
 
 class AnotherSubDetails:
@@ -21,7 +21,10 @@ class Person:
 
     age = IntegerGenerator(start=1, end=10)
     phone_no = IntegerGenerator(start=9000000010, end=9999999999)
+    name = StringGenerator("random")
+    eligible=BooleanGenerator()
     details = Nesting(relation_with=Details)
+
 
 
 def create_json_obj(obj, many=False, many_count=0):
