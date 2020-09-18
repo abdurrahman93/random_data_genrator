@@ -1,7 +1,8 @@
 import random
-from abstract_base import DataGeneratorBase
+import uuid
 from pathlib import Path
 import datetime
+from base_class import DataGeneratorBase
 
 
 class IntegerGenerator(DataGeneratorBase):
@@ -90,9 +91,54 @@ class DateGenerator(DataGeneratorBase):
         return random_date.strftime(self.format)
 
 
+class UUIDGenerator(DataGeneratorBase):
+
+    def __init__(self):
+        self._object_type = type(uuid.uuid4())
+
+    @property
+    def object_type(self):
+        return self._object_type
+
+    def validate(self):
+        pass
+
+    def get_value(self):
+        return str(uuid.uuid4())
+
+
 class Nesting:
 
     def __init__(self, relation_with, many=False, many_count=0):
         self.relation_with = relation_with
         self.many = many
         self.many_count = many_count
+        self.relate_by = 'id'
+
+    def validate(self):
+        if not self.relate_by:
+            raise ValueError('relate_by cannot be empty or none')
+        elif type(self.relate_by) is not str:
+            raise ValueError('relate_by should be str type')
+
+
+class ObjectGenerator:
+
+    @staticmethod
+    def _check_if_object_has_nesting(attr_to_use):
+        for attr_name, attr_obj in attr_to_use.items():
+            if isinstance(attr_obj, Nesting):
+                return True
+        return False
+
+    @classmethod
+    def _validate(cls):
+        attr_to_use = {key: value for key, value in vars(cls).items() if not key.startswith('_')}
+        if cls._check_if_object_has_nesting(attr_to_use):
+            if 'id' not in attr_to_use.keys():
+                raise ValueError(f"{cls.__name__} have nesting should have id attribute")
+
+        for attr_name, attr_obj in attr_to_use.items():
+            attr_obj.validate()
+            if isinstance(attr_obj, Nesting):
+                attr_obj.relation_with._validate()
