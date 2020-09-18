@@ -1,26 +1,26 @@
 from pathlib import Path
 from openpyxl import Workbook, load_workbook
-from rule_classes import ObjectGenerator, IntegerGenerator, StringGenerator, BooleanGenerator, DateGenerator, \
+from rule_classes import ObjectValidator, IntegerGenerator, StringGenerator, BooleanGenerator, DateGenerator, \
     Nesting, UUIDGenerator
 
 
-class AnotherSubDetails(ObjectGenerator):
+class AnotherSubDetails(ObjectValidator):
     polo = IntegerGenerator(start=1000, end=20000)
 
 
-class SubDetails(ObjectGenerator):
+class SubDetails(ObjectValidator):
     id = UUIDGenerator()
     yolo = IntegerGenerator(start=1000, end=20000)
     another_details = Nesting(relation_with=AnotherSubDetails)
 
 
-class Details(ObjectGenerator):
+class Details(ObjectValidator):
     id = UUIDGenerator()
     money = IntegerGenerator(start=1000, end=20000)
     sub_details = Nesting(relation_with=SubDetails, many=True, many_count=2)
 
 
-class Person(ObjectGenerator):
+class Person(ObjectValidator):
     id = UUIDGenerator()
     age = IntegerGenerator(start=1, end=10)
     phone_no = IntegerGenerator(start=9000000010, end=9999999999)
@@ -28,14 +28,6 @@ class Person(ObjectGenerator):
     name = StringGenerator("country")
     date_time = DateGenerator()
     details = Nesting(relation_with=Details)
-
-
-class SimpleObj(ObjectGenerator):
-    id = UUIDGenerator()
-    age = IntegerGenerator(start=1, end=10)
-    phone_no = IntegerGenerator(start=9000000010, end=9999999999)
-    eligible = BooleanGenerator()
-    details = Nesting(relation_with=AnotherSubDetails)
 
 
 class RandomDataGenerator:
@@ -66,33 +58,37 @@ class RandomDataGenerator:
 
             yield temp_dict
 
-    def write_csv(self, obj_to_create, obj_name, folder_path):
-        excel_name = folder_path.joinpath(obj_name + '.xlsx')
-        if excel_name.exists():
-            wb = load_workbook(filename=excel_name.__str__())
-            ws = wb.active
-        else:
-            wb = Workbook()
-            ws = wb.active
-            ws.append([key for key, value in obj_to_create.items() if not isinstance(value, (dict, list))])
+    def _write_csv(self, obj_to_create, obj_name, excel_wb):
+        try:
+            active_ws = excel_wb[obj_name]
+        except KeyError:
+            active_ws = excel_wb.create_sheet(title=obj_name)
+            active_ws.append([key for key, value in obj_to_create.items() if not isinstance(value, (dict, list))])
 
         values_to_write = list()
         for attr_name, attr_value in obj_to_create.items():
             if isinstance(attr_value, dict):
-                self.write_csv(attr_value, attr_name, folder_path)
+                self._write_csv(attr_value, attr_name, excel_wb)
             elif isinstance(attr_value, list):
                 for obj in attr_value:
-                    self.write_csv(obj, attr_name, folder_path)
+                    self._write_csv(obj, attr_name, excel_wb)
             else:
                 values_to_write.append(attr_value)
-        ws.append(values_to_write)
-        wb.save(filename=excel_name.__str__())
+        active_ws.append(values_to_write)
 
     def generate_csv(self, obj_to_create, folder_path=Path(r"F:\python_projects\random_data_genrator\src")):
         obj_to_create._validate()
+        wb = Workbook()
+        excel_name = folder_path.joinpath('data.xlsx')
         for i in range(5):
+            data = next(self._generate_data(obj_to_create))
+            print(data)
+            self._write_csv(data, obj_to_create.__name__, wb)
+        wb.save(filename=excel_name.__str__())
+
+
+
             # for data in self._generate_data(obj_to_create):
-            print(next(self._generate_data(obj_to_create)))
             # self.write_csv(data, obj_to_create.__name__, folder_path)
 
 import pprint

@@ -122,7 +122,7 @@ class Nesting:
             raise ValueError('relate_by should be str type')
 
 
-class ObjectGenerator:
+class ObjectValidator:
 
     @staticmethod
     def _check_if_object_has_nesting(attr_to_use):
