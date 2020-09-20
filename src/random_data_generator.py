@@ -1,33 +1,6 @@
 from pathlib import Path
-from openpyxl import Workbook, load_workbook
-from rule_classes import ObjectValidator, IntegerGenerator, StringGenerator, BooleanGenerator, DateGenerator, \
-    Nesting, UUIDGenerator
-
-
-class AnotherSubDetails(ObjectValidator):
-    polo = IntegerGenerator(start=1000, end=20000)
-
-
-class SubDetails(ObjectValidator):
-    id = UUIDGenerator()
-    yolo = IntegerGenerator(start=1000, end=20000)
-    another_details = Nesting(relation_with=AnotherSubDetails)
-
-
-class Details(ObjectValidator):
-    id = UUIDGenerator()
-    money = IntegerGenerator(start=1000, end=20000)
-    sub_details = Nesting(relation_with=SubDetails, many=True, many_count=2)
-
-
-class Person(ObjectValidator):
-    id = UUIDGenerator()
-    age = IntegerGenerator(start=1, end=10)
-    phone_no = IntegerGenerator(start=9000000010, end=9999999999)
-    eligible = BooleanGenerator()
-    name = StringGenerator("country")
-    date_time = DateGenerator()
-    details = Nesting(relation_with=Details)
+from openpyxl import Workbook
+from rule_classes import Nesting
 
 
 class RandomDataGenerator:
@@ -76,25 +49,16 @@ class RandomDataGenerator:
                 values_to_write.append(attr_value)
         active_ws.append(values_to_write)
 
-    def generate_csv(self, obj_to_create, folder_path=Path(r"F:\python_projects\random_data_genrator\src")):
+    def generate_json(self, object_count, obj_to_create):
+        return [next(self._generate_data(obj_to_create)) for idx in range(object_count)]
+
+    def generate_csv(self, object_count, obj_to_create, folder_path):
+        folder_path = folder_path if isinstance(folder_path, Path) else Path(folder_path)
         obj_to_create._validate()
         wb = Workbook()
         excel_name = folder_path.joinpath('data.xlsx')
-        for i in range(5):
+        for i in range(object_count):
             data = next(self._generate_data(obj_to_create))
             print(data)
             self._write_csv(data, obj_to_create.__name__, wb)
         wb.save(filename=excel_name.__str__())
-
-
-
-            # for data in self._generate_data(obj_to_create):
-            # self.write_csv(data, obj_to_create.__name__, folder_path)
-
-import pprint
-
-data_generator_ins = RandomDataGenerator()
-data_generator_ins.generate_csv(Person)
-#pp = pprint.PrettyPrinter(indent=4)
-
-#pp.pprint(next(data_generator_ins._generate_data(Person)))
