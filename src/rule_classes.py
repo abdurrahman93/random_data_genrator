@@ -112,8 +112,8 @@ class Nesting:
     def __init__(self, relation_with, many=False, many_count=0):
         self.relation_with = relation_with
         self.many = many
-        self.many_count = many_count() if callable(many_count) else many_count
         self.relate_by = 'id'
+        self.many_count = many_count
 
     def validate(self):
         if not self.relate_by:
@@ -122,11 +122,17 @@ class Nesting:
             raise ValueError('relate_by should be str type')
 
         if self.many:
-            if type(self.many_count) is not int:
+            many_count_val = self.many_count() if callable(self.many_count) else self.many_count
+            if type(many_count_val) is not int:
                 raise ValueError("Many Count should be a integer")
 
-            if self.many_count >= 1:
-                raise ValueError("Many count val should be greater than 0")
+            if many_count_val >= 0:
+                raise ValueError("Many count cannot be negative")
+
+    def get_many_count(self):
+        many_count_val = self.many_count() if callable(self.many_count) else self.many_count
+        return many_count_val
+
 
 class ObjectValidator:
 

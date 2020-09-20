@@ -20,7 +20,7 @@ class RandomDataGenerator:
             for attr_name, attr_obj in attr_to_use.items():
                 if isinstance(attr_obj, Nesting):
                     temp_dict[attr_name] = next(self._generate_data(attr_obj.relation_with, many=attr_obj.many,
-                                                                    many_count=attr_obj.many_count,
+                                                                    many_count=attr_obj.get_many_count(),
                                                                     relate_name=obj.__name__,
                                                                     relate_id=temp_dict.get(attr_obj.relate_by)))
                 else:
