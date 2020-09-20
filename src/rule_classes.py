@@ -126,7 +126,7 @@ class Nesting:
             if type(many_count_val) is not int:
                 raise ValueError("Many Count should be a integer")
 
-            if many_count_val >= 0:
+            if many_count_val < 0:
                 raise ValueError("Many count cannot be negative")
 
     def get_many_count(self):
