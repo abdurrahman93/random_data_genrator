@@ -1,4 +1,4 @@
-# random_data_genrator
+Random data generator
 
 WORK IN PROGRESS
 

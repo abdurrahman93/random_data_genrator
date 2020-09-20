@@ -112,14 +112,26 @@ class Nesting:
     def __init__(self, relation_with, many=False, many_count=0):
         self.relation_with = relation_with
         self.many = many
-        self.many_count = many_count
         self.relate_by = 'id'
+        self.many_count = many_count
 
     def validate(self):
         if not self.relate_by:
             raise ValueError('relate_by cannot be empty or none')
         elif type(self.relate_by) is not str:
             raise ValueError('relate_by should be str type')
+
+        if self.many:
+            many_count_val = self.many_count() if callable(self.many_count) else self.many_count
+            if type(many_count_val) is not int:
+                raise ValueError("Many Count should be a integer")
+
+            if many_count_val >= 0:
+                raise ValueError("Many count cannot be negative")
+
+    def get_many_count(self):
+        many_count_val = self.many_count() if callable(self.many_count) else self.many_count
+        return many_count_val
 
 
 class ObjectValidator:
@@ -136,7 +148,7 @@ class ObjectValidator:
         attr_to_use = {key: value for key, value in vars(cls).items() if not key.startswith('_')}
         if cls._check_if_object_has_nesting(attr_to_use):
             if 'id' not in attr_to_use.keys():
-                raise ValueError(f"{cls.__name__} have nesting should have id attribute")
+                raise ValueError(f"{cls.__name__} has nesting obj so it should have id attribute")
 
         for attr_name, attr_obj in attr_to_use.items():
             attr_obj.validate()
