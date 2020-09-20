@@ -23,7 +23,7 @@ class SubDetails(ObjectValidator):
 class Details(ObjectValidator):
     id = UUIDGenerator()
     money = IntegerGenerator(start=1000, end=20000)
-    # sub_details = Nesting(relation_with=SubDetails, many=True, many_count=lambda: random.randint(1, 4))
+    sub_details = Nesting(relation_with=SubDetails, many=True, many_count=lambda: random.randint(1, 4))
 
 
 class Person(ObjectValidator):
@@ -37,8 +37,8 @@ class Person(ObjectValidator):
 
 
 data_generator_ins = RandomDataGenerator()
-# data_generator_ins.generate_csv(4, Person, Path(__file__).parent)
-data = data_generator_ins.generate_json(10, Person)
-pp = pprint.PrettyPrinter(indent=4)
-pp.pprint(data)
+data_generator_ins.generate_csv(4, Person, Path(__file__).parent)
+# pp = pprint.PrettyPrinter(indent=4)
+# for data in data_generator_ins.generate_json(10, Person):
+#     pp.pprint(data)
 
