@@ -1,12 +1,23 @@
 from pathlib import Path
 from openpyxl import Workbook
-from rule_classes import Nesting
+from rule_classes import Nesting, DerivedVal
 
 
 class RandomDataGenerator:
 
     def __int__(self):
         pass
+
+    @staticmethod
+    def _get_attributes(obj):
+        attr_to_use = {key: value for key, value in vars(obj).items() if not key.startswith('_')}
+        temp_derived_data_inst_list = [(attr, data_ins) for attr, data_ins in attr_to_use.items() if
+                                       isinstance(data_ins, DerivedVal)]
+        attr_to_use = [(attr, data_ins) for attr, data_ins in attr_to_use.items() if not isinstance(data_ins, DerivedVal)]
+        if len(temp_derived_data_inst_list) > 1:
+            temp_derived_data_inst_list = sorted(temp_derived_data_inst_list, key=lambda x: x[1].order)
+        attr_to_use.extend(temp_derived_data_inst_list)
+        return attr_to_use
 
     def _generate_data(self, obj, many=False, many_count=0, relate_id=None, relate_name=None):
         if many:
@@ -16,13 +27,15 @@ class RandomDataGenerator:
             return temp_list
         else:
             temp_dict = dict()
-            attr_to_use = {key: value for key, value in vars(obj).items() if not key.startswith('_')}
-            for attr_name, attr_obj in attr_to_use.items():
+            attr_to_use = self._get_attributes(obj)
+            for attr_name, attr_obj in attr_to_use:
                 if isinstance(attr_obj, Nesting):
                     temp_dict[attr_name] = self._generate_data(attr_obj.relation_with, many=attr_obj.many,
                                                                many_count=attr_obj.get_many_count(),
                                                                relate_name=obj.__name__,
                                                                relate_id=temp_dict.get(attr_obj.relate_by))
+                elif isinstance(attr_obj, DerivedVal):
+                    temp_dict[attr_name] = attr_obj.get_value(**temp_dict)
                 else:
                     temp_dict[attr_name] = attr_obj.get_value()
 

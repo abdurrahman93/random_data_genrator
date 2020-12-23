@@ -134,6 +134,16 @@ class Nesting:
         return many_count_val
 
 
+class DerivedVal:
+
+    def __init__(self, custom_function, order=None):
+        self.custom_function = custom_function
+        self.order = order
+
+    def get_value(self, *args, **kwargs):
+        return self.custom_function(*args, **kwargs)
+
+
 class ObjectValidator:
 
     @staticmethod
